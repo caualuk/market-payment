@@ -26,10 +26,10 @@ export interface CartLine {
 export const CATALOG: readonly Product[] = [
   { id: 'leite', name: 'Leite Integral 1L', price: 549, emoji: '🥛', barcode: '7891000100103', tint: '#E5F0FF' },
   { id: 'pao', name: 'Pão de forma integral', price: 990, emoji: '🍞', barcode: '7896002301428', tint: '#FFF1DB' },
-  { id: 'abacate', name: 'Abacate', price: 420, emoji: '🥑', barcode: '2000000004206', tint: '#E3F9E9' },
-  { id: 'cafe', name: 'Café torrado 500g', price: 1890, emoji: '☕', barcode: '7896005800013', tint: '#F3E8DD' },
+  { id: 'abacate', name: 'Abacate', price: 420, emoji: '🥑', barcode: '2000000004204', tint: '#E3F9E9' },
+  { id: 'cafe', name: 'Café torrado 500g', price: 1890, emoji: '☕', barcode: '7896005800010', tint: '#F3E8DD' },
   { id: 'sabao', name: 'Sabão líquido 3L', price: 2490, emoji: '🧴', barcode: '7891024134702', tint: '#E8E8FF' },
-  { id: 'maca', name: 'Maçã Gala', price: 299, emoji: '🍎', barcode: '2000000002998', tint: '#FFE5E5' },
+  { id: 'maca', name: 'Maçã Gala', price: 299, emoji: '🍎', barcode: '2000000002996', tint: '#FFE5E5' },
 ]
 
 /** Limite de unidades por item, uma proteção simples contra toques acidentais. */
