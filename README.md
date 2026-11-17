@@ -26,7 +26,7 @@ Pré-requisito: Node.js 20+ (o projeto foi desenvolvido com Node 24).
 cd landing
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 95 testes (Vitest + Testing Library)
+npm test           # 131 testes (Vitest + Testing Library)
 npm run coverage   # relatório de cobertura em landing/coverage/
 npm run build      # build de produção em landing/dist/
 ```
