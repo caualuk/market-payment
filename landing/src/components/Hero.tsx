@@ -3,7 +3,7 @@ import { Reveal } from './ui/Reveal'
 
 export function Hero() {
   return (
-    <section id="top" className="section hero" data-scene="hero" data-surface="dark">
+    <section id="top" className="section hero" data-surface="dark">
       <div className="aurora" aria-hidden="true" />
       <div className="container hero-inner">
         <p className="pill pill-glass">

@@ -1,21 +1,40 @@
 /**
- * Seção "Como funciona": bloco alto com conteúdo `sticky`. O progresso do
- * scroll escolhe o passo ativo e, via `sceneStore`, a tela do celular 3D.
+ * "Como funciona": bloco alto com conteúdo `sticky`. Cada passo do texto
+ * corresponde a um capítulo do roteiro 3D (story.ts) — o que você lê é o
+ * que a cena está mostrando.
  */
 import { useLayoutEffect, useRef, useState } from 'react'
+import { clamp } from '../lib/motion'
 import { ScrollTrigger } from '../lib/gsap'
-import { howStep } from '../scene/keyframes'
-import { sceneStore, setSection } from '../scene/store'
 
 export const STEPS = [
-  { title: 'Check-in na loja', body: 'Ao entrar, o cliente lê o QR da entrada (ou é localizado pelo GPS). O app carrega preços e promoções daquela unidade.' },
-  { title: 'Escaneie e ensacole', body: 'Aponte a câmera para o código de barras. O item entra no carrinho do app e vai direto para a sacola, no carrinho de verdade.' },
-  { title: 'Pague no app', body: 'Pix, carteira digital ou cartão salvo. O total fecha com descontos do clube aplicados automaticamente.' },
-  { title: 'Mostre o passe e saia', body: 'Um QR verde, que se renova a cada 30 s, é o comprovante. O caixa escaneia no balcão e libera a saída.' },
+  {
+    title: 'Check-in na loja',
+    body: 'Ao entrar, o cliente lê o QR da entrada. O app reconhece o Mercado Aurora e carrega os preços e promoções daquela unidade.',
+  },
+  {
+    title: 'Escaneie e ensacole',
+    body: 'A câmera lê o código de barras e o produto entra no carrinho do app. Ao mesmo tempo, ele vai para a cesta de verdade.',
+  },
+  {
+    title: 'Pague no app',
+    body: 'O total fecha com tudo que foi lido. Pix, carteira digital ou cartão aprovam na hora, e o dinheiro fica para o caixa expresso.',
+  },
+  {
+    title: 'Mostre o passe e saia',
+    body: 'Na saída, o tablet do balcão lê o QR verde, que se renova a cada 30 s, e a cancela abre. Ninguém precisa conferir item por item.',
+  },
 ]
 
-export function HowItWorks() {
+/** Passo ativo (0..3) para o progresso 0→1 da seção. */
+export function stepAt(progress: number): number {
+  return Math.min(STEPS.length - 1, Math.floor(clamp(progress) * STEPS.length))
+}
+
+export function HowItWorks({ onProgress }: { onProgress?: (p: number) => void }) {
   const ref = useRef<HTMLElement>(null)
+  const cb = useRef(onProgress)
+  cb.current = onProgress
   const [step, setStep] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -27,18 +46,15 @@ export function HowItWorks() {
       end: 'bottom bottom',
       onUpdate: (self) => {
         setProgress(self.progress)
-        setStep(howStep(self.progress))
-        if (sceneStore.section === 'how') sceneStore.progress = self.progress
-      },
-      onToggle: (self) => {
-        if (self.isActive) setSection('how', self.progress)
+        setStep(stepAt(self.progress))
+        cb.current?.(self.progress)
       },
     })
     return () => st.kill()
   }, [])
 
   return (
-    <section ref={ref} id="como-funciona" className="section how" data-scene="how" data-scene-progress="self" data-surface="light" style={{ ['--steps' as string]: STEPS.length }}>
+    <section ref={ref} id="como-funciona" className="section how" data-surface="light" style={{ ['--steps' as string]: STEPS.length }}>
       <div className="how-sticky">
         <div className="container how-inner">
           <span className="eyebrow">Como funciona</span>

@@ -1,51 +1,81 @@
-import { Reveal } from './ui/Reveal'
-import { TiltCard } from './ui/TiltCard'
+/**
+ * "Dinheiro também passa": seção sticky com a cena do balcão do caixa
+ * expresso. Cada passo do texto corresponde a um passo de `cash.ts`.
+ */
+import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
+import { useInView } from '../hooks/useInView'
+import { ScrollTrigger } from '../lib/gsap'
+import { CASH_STEPS } from '../scene/cash'
+import { sceneStore } from '../scene/store'
 
-const CASH_STEPS = [
+const CashScene = lazy(() => import('../scene/CashScene'))
+
+export const CASH_COPY = [
   {
-    n: '01',
     title: 'Escolha “Dinheiro no caixa”',
-    body: 'O app gera um código de pagamento (QR âmbar + 6 dígitos) com o total fechado. O carrinho trava para edição até o pagamento.',
+    body: 'O app gera um código de pagamento: um QR âmbar e 6 dígitos com o total fechado. O carrinho trava até o pagamento.',
   },
   {
-    n: '02',
-    title: 'Vá ao caixa expresso',
-    body: 'Sem passar item por item: o operador escaneia o código, vê o pedido, recebe o dinheiro e toca no valor entregue. O troco aparece calculado.',
+    title: 'O caixa lê o código',
+    body: 'No caixa expresso, sem esteira, o tablet lê o QR e abre o pedido inteiro. Ninguém passa os itens de novo.',
   },
   {
-    n: '03',
-    title: 'O QR vira passe na hora',
-    body: 'Ao confirmar, o QR âmbar do cliente fica verde em tempo real. Pagamento e liberação da saída acontecem no mesmo balcão, com um único scan.',
+    title: 'Entregue o dinheiro',
+    body: 'O operador toca no valor recebido e o troco aparece calculado. Com o troco digital, ele vai direto para a carteira Passa, sem caçar moedas.',
+  },
+  {
+    title: 'O QR vira passe',
+    body: 'Ao confirmar, o QR âmbar do cliente fica verde em tempo real e a cancela abre. Pagamento e saída acontecem no mesmo balcão.',
   },
 ]
 
-export function CashFlow() {
+export function CashFlow({ webgl = false }: { webgl?: boolean }) {
+  const ref = useRef<HTMLElement>(null)
+  const stage = useRef<HTMLDivElement>(null)
+  const active = useInView(stage)
+  const [step, setStep] = useState(0)
+
+  useLayoutEffect(() => {
+    if (!ref.current) return
+    const st = ScrollTrigger.create({
+      trigger: ref.current,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: (self) => {
+        sceneStore.cash = self.progress
+        setStep(Math.min(CASH_STEPS.length - 1, Math.floor(self.progress * CASH_STEPS.length)))
+      },
+    })
+    return () => st.kill()
+  }, [])
+
   return (
-    <section id="dinheiro" className="section cash" data-scene="cash" data-surface="warm">
-      <div className="container cash-inner">
-        <header className="section-head">
-          <span className="eyebrow amber">Dinheiro também passa</span>
-          <Reveal as="h2">Quem paga em espécie não fica para trás.</Reveal>
-          <p className="lede">
-            O cliente usa o app normalmente e só vai ao caixa para entregar o dinheiro. Nada de recontar a compra.
-          </p>
-        </header>
-        <div className="cash-cards">
-          {CASH_STEPS.map((s) => (
-            <TiltCard key={s.n} className="cash-card">
-              <span className="cash-n">{s.n}</span>
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-            </TiltCard>
-          ))}
-        </div>
-        <TiltCard className="cash-extra">
-          <div>
-            <h3>Troco digital</h3>
-            <p>O troco pode virar crédito na carteira Passa, o que acaba com a falta de moedas no caixa e traz o cliente de volta.</p>
+    <section ref={ref} id="dinheiro" className="section cash" data-surface="warm" style={{ ['--steps' as string]: CASH_STEPS.length }}>
+      <div className="cash-sticky">
+        <div className="container cash-grid">
+          <div className="cash-copy">
+            <span className="eyebrow amber">Dinheiro também passa</span>
+            <h2>Quem paga em espécie não fica para trás.</h2>
+            <ol className="cash-steps">
+              {CASH_COPY.map((s, i) => (
+                <li key={s.title} className={i === step ? 'is-active' : i < step ? 'is-done' : ''} aria-current={i === step ? 'step' : undefined}>
+                  <span className="cash-n">0{i + 1}</span>
+                  <div>
+                    <h3>{s.title}</h3>
+                    <p>{s.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
-          <span className="cash-coin" aria-hidden="true">R$</span>
-        </TiltCard>
+          <div className="cash-stage" ref={stage}>
+            {webgl && (
+              <Suspense fallback={null}>
+                <CashScene active={active} />
+              </Suspense>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   )

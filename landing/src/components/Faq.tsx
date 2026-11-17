@@ -28,7 +28,7 @@ export function Faq() {
   const base = useId()
 
   return (
-    <section id="faq" className="section faq" data-scene="demo" data-surface="light">
+    <section id="faq" className="section faq" data-surface="light">
       <div className="container faq-inner">
         <header className="section-head">
           <span className="eyebrow">Dúvidas</span>

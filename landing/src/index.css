@@ -106,21 +106,34 @@ a {
   top: 16px;
 }
 
-/* ---------- camada 3D ---------- */
-.scene-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
+/* ---------- cenas 3D ----------
+   Cada cena vive dentro do bloco que ela ilustra (sticky), então sai de
+   quadro junto com ele — nada de canvas fixo atravessando a página. */
 .scene-canvas {
   width: 100%;
   height: 100%;
 }
-main,
-.footer {
+.story {
+  position: relative;
+}
+.story-stage {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  pointer-events: none;
+}
+/* puxa o hero para cima da cena (em vez de margem negativa no sticky, que
+   deixaria a cena "vazar" 100vh além do fim do bloco) */
+.story-stage + section {
+  margin-top: -100svh;
+}
+.story > section {
   position: relative;
   z-index: 1;
+}
+.footer {
+  position: relative;
 }
 
 /* ---------- layout ---------- */
@@ -1103,19 +1116,68 @@ html[data-surface='light'] .btn-ghost {
   color: #fff;
 }
 
-/* ---------- dinheiro ---------- */
-.cash-inner {
-  display: grid;
-  justify-items: end;
+/* ---------- dinheiro (sticky + cena do balcão) ---------- */
+.cash {
+  height: calc(var(--steps) * 80svh);
+  padding: 0;
 }
-.cash-inner .section-head {
-  justify-self: end;
+.cash-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: 64px;
 }
-.cash-cards {
+.cash-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: center;
+  gap: 24px;
+}
+.cash-copy h2 {
+  max-width: 10em;
+  margin-bottom: 28px;
+}
+.cash-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cash-steps li {
+  display: flex;
   gap: 16px;
-  max-width: 760px;
+  padding: 14px 18px;
+  border-radius: var(--radius-m);
+  opacity: 0.4;
+  transition: opacity 0.5s var(--ease-out), background-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.cash-steps li.is-done {
+  opacity: 0.6;
+}
+.cash-steps li.is-active {
+  opacity: 1;
+  background: var(--card);
+  box-shadow: 0 20px 50px rgba(179, 107, 0, 0.1);
+  transform: translateX(8px);
+}
+.cash-steps p {
+  margin: 6px 0 0;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+.cash-n {
+  flex: none;
+  padding-top: 2px;
+  font-family: var(--mono);
+  color: var(--amber-ink);
+  font-weight: 700;
+}
+.cash-stage {
+  height: min(78svh, 680px);
+  pointer-events: none;
 }
 .tilt {
   position: relative;
@@ -1134,49 +1196,6 @@ html[data-surface='light'] .btn-ghost {
 }
 .tilt:hover::after {
   opacity: 1;
-}
-.cash-card,
-.cash-extra {
-  padding: 26px;
-  border-radius: var(--radius-l);
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(20px) saturate(160%);
-}
-.cash-card p,
-.cash-extra p {
-  margin: 10px 0 0;
-  color: var(--fg-muted);
-  line-height: 1.5;
-}
-.cash-n {
-  display: block;
-  margin-bottom: 20px;
-  font-family: var(--mono);
-  color: var(--amber-ink);
-  font-weight: 700;
-}
-.cash-extra {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  max-width: 760px;
-  width: 100%;
-  margin-top: 16px;
-}
-.cash-coin {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffe08a, #e8b23a 60%, #b8860b);
-  color: #7a5200;
-  font-weight: 800;
-  font-size: 1.4rem;
-  box-shadow: 0 16px 30px rgba(184, 134, 11, 0.35), inset 0 -4px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* ---------- lojistas ---------- */
@@ -1330,7 +1349,6 @@ html[data-surface='light'] .btn-ghost {
     grid-template-columns: 1fr;
     justify-items: center;
   }
-  .cash-cards,
   .bento {
     grid-template-columns: 1fr 1fr;
   }
@@ -1385,12 +1403,27 @@ html[data-surface='light'] .btn-ghost {
     align-items: flex-start;
     padding-top: 110px;
   }
-  .cash-inner,
-  .cash-inner .section-head {
-    justify-items: stretch;
-    justify-self: stretch;
+  .cash-sticky {
+    align-items: flex-start;
+    padding-top: 84px;
   }
-  .cash-cards,
+  .cash-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .cash-copy h2 {
+    font-size: 1.9rem;
+    margin-bottom: 12px;
+  }
+  .cash-steps li:not(.is-active) {
+    display: none;
+  }
+  .cash-steps li.is-active {
+    transform: none;
+  }
+  .cash-stage {
+    height: 46svh;
+  }
   .bento {
     grid-template-columns: 1fr;
   }
@@ -1398,7 +1431,6 @@ html[data-surface='light'] .btn-ghost {
     grid-column: auto;
   }
   .section-head,
-  .cash-card,
   .bento-card {
     backdrop-filter: blur(16px);
   }
@@ -1427,8 +1459,6 @@ html[data-surface='light'] .btn-ghost {
 @media (prefers-reduced-transparency: reduce) {
   .glass,
   .nav.is-scrolled,
-  .cash-card,
-  .cash-extra,
   .bento-card {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -1437,7 +1467,6 @@ html[data-surface='light'] .btn-ghost {
 }
 @media (prefers-contrast: more) {
   .glass,
-  .cash-card,
   .bento-card,
   .faq-item {
     border-width: 2px;

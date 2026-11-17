@@ -48,7 +48,7 @@ export function Demo() {
   }
 
   return (
-    <section id="demo" className="section demo" data-scene="demo" data-surface="light">
+    <section id="demo" className="section demo" data-surface="light">
       <div className="container">
         <header className="section-head">
           <span className="eyebrow">Experimente</span>

@@ -6,7 +6,7 @@ const YEAR = new Date().getFullYear()
 export function FinalCta() {
   return (
     <>
-      <section id="contato" className="section final" data-scene="cta" data-surface="dark">
+      <section id="contato" className="section final" data-surface="dark">
         <div className="aurora aurora-2" aria-hidden="true" />
         <div className="container final-inner">
           <Reveal as="h2" className="display">A fila acabou de sair do seu mercado.</Reveal>

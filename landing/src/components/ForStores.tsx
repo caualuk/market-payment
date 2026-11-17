@@ -11,7 +11,7 @@ const FEATURES = [
 
 export function ForStores() {
   return (
-    <section id="lojistas" className="section stores" data-scene="stores" data-surface="dark">
+    <section id="lojistas" className="section stores" data-surface="dark">
       <div className="container">
         <header className="section-head center">
           <span className="eyebrow">Para mercados e comércios</span>

@@ -16,7 +16,7 @@ export default defineConfig({
     css: false,
     coverage: {
       provider: 'v8',
-      include: ['src/lib/**', 'src/scene/keyframes.ts', 'src/components/**'],
+      include: ['src/lib/**', 'src/scene/story.ts', 'src/scene/cash.ts', 'src/components/**'],
       reporter: ['text', 'html'],
     },
   },
